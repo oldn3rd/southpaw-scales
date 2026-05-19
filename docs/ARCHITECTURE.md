@@ -23,5 +23,6 @@ Kubernetes manifests live in `deploy/kubernetes` and use:
 - service on port `80`
 - nginx ingress for `guitar.denley.nz`
 - `letsencrypt-cloudflare` as the cluster certificate issuer
+- node placement on `kccontrol` for the initial locally imported image path
 
 The app is stateless and does not require persistent storage.
