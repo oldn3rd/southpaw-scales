@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: guitar-scale-generator
+  namespace: guitar
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-cloudflare
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - guitar.denley.nz
+      secretName: guitar-denley-nz-tls
+  rules:
+    - host: guitar.denley.nz
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: guitar-scale-generator
+                port:
+                  name: http

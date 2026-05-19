@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: guitar-scale-generator
+  namespace: guitar
+  labels:
+    app.kubernetes.io/name: guitar-scale-generator
+spec:
+  selector:
+    app.kubernetes.io/name: guitar-scale-generator
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
