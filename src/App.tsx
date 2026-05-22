@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { CSSProperties } from "react";
 import {
   CHROMATIC_SHARP,
@@ -17,11 +17,17 @@ import {
 } from "./music";
 
 const fretNumbers = Array.from({ length: 13 }, (_, fret) => fret);
+const handednessStorageKey = "guitar-scale-generator-handedness";
+
+function getStoredHandedness(): Handedness {
+  if (typeof window === "undefined") return "right";
+  return window.localStorage.getItem(handednessStorageKey) === "left" ? "left" : "right";
+}
 
 export default function App() {
   const [root, setRoot] = useState<NoteName>("C");
   const [modeId, setModeId] = useState("ionian");
-  const [handedness, setHandedness] = useState<Handedness>("right");
+  const [handedness, setHandedness] = useState<Handedness>(getStoredHandedness);
 
   const mode = getMode(modeId);
   const scaleNotes = useMemo(() => getScaleNotes(root, modeId), [root, modeId]);
@@ -32,6 +38,10 @@ export default function App() {
   const fretboard = useMemo(() => getFretboard(root, modeId), [root, modeId]);
   const relativeModes = useMemo(() => getRelativeModes(root, modeId), [root, modeId]);
   const orderedFrets = orderFrets(fretNumbers, handedness);
+
+  useEffect(() => {
+    window.localStorage.setItem(handednessStorageKey, handedness);
+  }, [handedness]);
 
   return (
     <main className="app-shell">
@@ -184,68 +194,78 @@ export default function App() {
         </div>
       </section>
 
-      <section className="relationship-panel">
-        <div className="panel-heading">
-          <div>
-            <span className="card-label">Rows of related scales</span>
-            <h2>Mode Relationship Map</h2>
+      <div className="harmony-layout">
+        <section className="relationship-panel">
+          <div className="panel-heading">
+            <div>
+              <span className="card-label">Rows of related scales</span>
+              <h2>Mode Relationship Map</h2>
+            </div>
           </div>
-        </div>
-        <div className="mode-grid">
-          {relativeModes.map(({ mode: relativeMode, root: relativeRoot, notes }) => (
-            <article
-              className={relativeMode.id === modeId ? "mode-row selected" : "mode-row"}
-              key={relativeMode.id}
-              style={{ "--accent": relativeMode.color } as CSSProperties}
-            >
-              <button onClick={() => { setRoot(relativeRoot); setModeId(relativeMode.id); }}>
-                <span>{relativeRoot}</span>
-                <strong>{relativeMode.name}</strong>
-              </button>
-              <div className="mode-notes">
-                {notes.map((note, index) => (
-                  <span key={`${relativeMode.id}-${note}-${index}`} className={index === 0 ? "root-note" : ""}>
-                    {note}
+          <div className="mode-grid">
+            {relativeModes.map(({ mode: relativeMode, root: relativeRoot, notes, triad, seventh }) => (
+              <article
+                className={relativeMode.id === modeId ? "mode-row selected" : "mode-row"}
+                key={relativeMode.id}
+                style={{ "--accent": relativeMode.color } as CSSProperties}
+              >
+                <button onClick={() => { setRoot(relativeRoot); setModeId(relativeMode.id); }}>
+                  <span>{relativeRoot}</span>
+                  <strong>{relativeMode.name}</strong>
+                </button>
+                <div className="mode-notes">
+                  {notes.map((note, index) => (
+                    <span key={`${relativeMode.id}-${note}-${index}`} className={index === 0 ? "root-note" : ""}>
+                      {note}
+                    </span>
+                  ))}
+                </div>
+                <div className="available-chords">
+                  <span className="triad" title={`${triad.roman}: ${triad.notes.join(" ")}`}>
+                    {triad.symbol}
                   </span>
-                ))}
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
+                  <span className="seventh" title={`${seventh.roman}: ${seventh.notes.join(" ")}`}>
+                    {seventh.symbol}
+                  </span>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
 
-      <section className="borrow-panel">
-        <div className="panel-heading">
-          <div>
-            <span className="card-label">Parallel colour</span>
-            <h2>Borrowed Seventh Chords From {root} Parallel Modes</h2>
+        <section className="borrow-panel">
+          <div className="panel-heading">
+            <div>
+              <span className="card-label">Parallel colour</span>
+              <h2>Borrowed Seventh Chords From {root} Parallel Modes</h2>
+            </div>
           </div>
-        </div>
-        <div className="parallel-grid">
-          {parallelChordRows.map(({ mode: parallelMode, chords }) => (
-            <article
-              className={parallelMode.id === modeId ? "parallel-row selected" : "parallel-row"}
-              key={parallelMode.id}
-              style={{ "--accent": parallelMode.color } as CSSProperties}
-            >
-              <button onClick={() => setModeId(parallelMode.id)} type="button">
-                {root} {parallelMode.name}
-              </button>
-              <div className="parallel-chords">
-                {chords.map((chord) => (
-                  <span
-                    className={selectedChordSymbols.has(chord.symbol) ? "available" : "borrowed"}
-                    key={`${parallelMode.id}-${chord.degree}-${chord.symbol}`}
-                    title={`${chord.roman}: ${chord.notes.join(" ")}`}
-                  >
-                    {chord.symbol}
-                  </span>
-                ))}
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
+          <div className="parallel-grid">
+            {parallelChordRows.map(({ mode: parallelMode, chords }) => (
+              <article
+                className={parallelMode.id === modeId ? "parallel-row selected" : "parallel-row"}
+                key={parallelMode.id}
+                style={{ "--accent": parallelMode.color } as CSSProperties}
+              >
+                <button onClick={() => setModeId(parallelMode.id)} type="button">
+                  {root} {parallelMode.name}
+                </button>
+                <div className="parallel-chords">
+                  {chords.map((chord) => (
+                    <span
+                      className={selectedChordSymbols.has(chord.symbol) ? "available" : "borrowed"}
+                      key={`${parallelMode.id}-${chord.degree}-${chord.symbol}`}
+                      title={`${chord.roman}: ${chord.notes.join(" ")}`}
+                    >
+                      {chord.symbol}
+                    </span>
+                  ))}
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      </div>
     </main>
   );
 }

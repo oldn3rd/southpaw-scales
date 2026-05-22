@@ -29,7 +29,7 @@ npm run build
 ## Container
 
 ```bash
-docker build -t git.denley.nz/oldn3rd/guitar-scale-generator:0.1.0 .
+docker build -t git.denley.nz/oldn3rd/guitar-scale-generator:0.1.1 .
 ```
 
 Push that image to the registry your cluster can pull from, then deploy:

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   getDiatonicSeventhChords,
+  getDiatonicTriads,
   getFretboard,
   getParentMajorKey,
   getParallelChordRows,
@@ -60,6 +61,18 @@ describe("music theory helpers", () => {
       "F#7",
       "G#m7",
       "A#m7b5"
+    ]);
+  });
+
+  it("builds available triads inside a major key", () => {
+    expect(getDiatonicTriads("C", "ionian").map((chord) => chord.symbol)).toEqual([
+      "C",
+      "Dm",
+      "Em",
+      "F",
+      "G",
+      "Am",
+      "Bdim"
     ]);
   });
 

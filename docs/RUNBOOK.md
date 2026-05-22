@@ -10,7 +10,7 @@ npm run build
 ## Build Image
 
 ```bash
-docker build -t git.denley.nz/oldn3rd/guitar-scale-generator:0.1.0 .
+docker build -t git.denley.nz/oldn3rd/guitar-scale-generator:0.1.1 .
 ```
 
 For the current homelab deployment, the image is built on `kccontrol` and imported into k3s containerd there. The deployment is pinned to `kccontrol` until registry-based image pulls are configured.

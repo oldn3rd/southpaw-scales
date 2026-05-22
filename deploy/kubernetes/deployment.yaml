@@ -19,7 +19,7 @@ spec:
         kubernetes.io/hostname: kccontrol
       containers:
         - name: web
-          image: git.denley.nz/oldn3rd/guitar-scale-generator:0.1.0
+          image: git.denley.nz/oldn3rd/guitar-scale-generator:0.1.1
           imagePullPolicy: IfNotPresent
           ports:
             - name: http

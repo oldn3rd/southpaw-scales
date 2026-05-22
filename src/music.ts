@@ -33,6 +33,15 @@ export type SeventhChord = {
   notes: NoteName[];
 };
 
+export type TriadChord = {
+  degree: number;
+  roman: string;
+  root: NoteName;
+  symbol: string;
+  quality: string;
+  notes: NoteName[];
+};
+
 export type ParallelChordRow = {
   mode: Mode;
   chords: SeventhChord[];
@@ -90,11 +99,35 @@ export function getParentMajorKey(root: NoteName, modeId: string): NoteName {
 
 export function getRelativeModes(root: NoteName, modeId: string) {
   const parent = getParentMajorKey(root, modeId);
+  const triads = getDiatonicTriads(parent, "ionian");
+  const sevenths = getDiatonicSeventhChords(parent, "ionian");
   return MODES.map((mode) => ({
     mode,
     root: transpose(parent, mode.parentOffset),
-    notes: getScaleNotes(transpose(parent, mode.parentOffset), mode.id)
+    notes: getScaleNotes(transpose(parent, mode.parentOffset), mode.id),
+    triad: triads[MODES.indexOf(mode)],
+    seventh: sevenths[MODES.indexOf(mode)]
   }));
+}
+
+export function getDiatonicTriads(root: NoteName, modeId: string): TriadChord[] {
+  const scaleNotes = getScaleNotes(root, modeId);
+  return scaleNotes.map((chordRoot, index) => {
+    const notes = [
+      scaleNotes[index],
+      scaleNotes[(index + 2) % scaleNotes.length],
+      scaleNotes[(index + 4) % scaleNotes.length]
+    ];
+    const quality = getTriadQuality(notes);
+    return {
+      degree: index + 1,
+      roman: getTriadRoman(index, quality),
+      root: chordRoot,
+      symbol: `${chordRoot}${getTriadSuffix(quality)}`,
+      quality,
+      notes
+    };
+  });
 }
 
 export function getDiatonicSeventhChords(root: NoteName, modeId: string): SeventhChord[] {
@@ -193,6 +226,30 @@ function getSeventhQuality(notes: NoteName[]): string {
   return qualities[signature] ?? "seventh";
 }
 
+function getTriadQuality(notes: NoteName[]): string {
+  const rootIndex = CHROMATIC_SHARP.indexOf(notes[0]);
+  const intervals = notes.slice(1).map((note) => (CHROMATIC_SHARP.indexOf(note) - rootIndex + 12) % 12);
+  const signature = intervals.join("-");
+  const qualities: Record<string, string> = {
+    "4-7": "major",
+    "3-7": "minor",
+    "3-6": "diminished",
+    "4-8": "augmented"
+  };
+  return qualities[signature] ?? "triad";
+}
+
+function getTriadSuffix(quality: string): string {
+  const suffixes: Record<string, string> = {
+    major: "",
+    minor: "m",
+    diminished: "dim",
+    augmented: "aug",
+    triad: ""
+  };
+  return suffixes[quality] ?? "";
+}
+
 function getChordSuffix(quality: string): string {
   const suffixes: Record<string, string> = {
     "major seventh": "maj7",
@@ -206,6 +263,16 @@ function getChordSuffix(quality: string): string {
     seventh: "7"
   };
   return suffixes[quality] ?? "7";
+}
+
+function getTriadRoman(index: number, quality: string): string {
+  const major = ["I", "II", "III", "IV", "V", "VI", "VII"];
+  const minor = ["i", "ii", "iii", "iv", "v", "vi", "vii"];
+  if (quality === "major") return major[index];
+  if (quality === "minor") return minor[index];
+  if (quality === "diminished") return `${minor[index]}°`;
+  if (quality === "augmented") return `${major[index]}+`;
+  return major[index];
 }
 
 function getRoman(index: number, quality: string): string {

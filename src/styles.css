@@ -134,9 +134,8 @@ h2 {
 .summary-band,
 .chord-panel,
 .fretboard-panel,
-.relationship-panel,
-.borrow-panel {
-  max-width: 1440px;
+.harmony-layout {
+  max-width: 1680px;
   margin: 0 auto 24px;
 }
 
@@ -397,8 +396,8 @@ h2 {
 
 .mode-row {
   display: grid;
-  grid-template-columns: 190px 1fr;
-  gap: 14px;
+  grid-template-columns: 190px minmax(240px, 1fr) auto;
+  gap: 12px;
   align-items: center;
   padding: 12px;
   border: 1px solid #dce3ed;
@@ -438,6 +437,46 @@ h2 {
   text-align: left;
 }
 
+.available-chords {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.available-chords span {
+  display: grid;
+  place-items: center;
+  min-width: 70px;
+  min-height: 34px;
+  border-radius: 8px;
+  font-weight: 900;
+}
+
+.available-chords .triad {
+  background: #18212f;
+  color: #ffffff;
+}
+
+.available-chords .seventh {
+  border: 1px solid color-mix(in srgb, var(--accent) 55%, #d7dfeb);
+  background: color-mix(in srgb, var(--accent) 11%, white);
+  color: #253247;
+}
+
+.harmony-layout {
+  display: grid;
+  grid-template-columns: minmax(620px, 1fr) minmax(620px, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.harmony-layout .relationship-panel,
+.harmony-layout .borrow-panel {
+  margin: 0;
+  max-width: none;
+}
+
 .parallel-grid {
   display: grid;
   gap: 10px;
@@ -445,8 +484,8 @@ h2 {
 
 .parallel-row {
   display: grid;
-  grid-template-columns: 190px 1fr;
-  gap: 14px;
+  grid-template-columns: 176px 1fr;
+  gap: 12px;
   align-items: center;
   padding: 12px;
   border: 1px solid #dce3ed;
@@ -478,7 +517,7 @@ h2 {
 .parallel-chords span {
   display: grid;
   place-items: center;
-  min-width: 74px;
+  min-width: 68px;
   min-height: 34px;
   border-radius: 8px;
   font-weight: 900;
@@ -499,9 +538,14 @@ h2 {
   .topbar,
   .summary-band,
   .scale-card,
+  .harmony-layout,
   .mode-row,
   .parallel-row {
     grid-template-columns: 1fr;
+  }
+
+  .available-chords {
+    justify-content: flex-start;
   }
 
   .controls {
