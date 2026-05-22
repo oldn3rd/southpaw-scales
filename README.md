@@ -38,7 +38,7 @@ Manual deploy, once the Cloudflare token has Pages edit access:
 npm run deploy:cloudflare
 ```
 
-GitHub Actions is also prepared as a manual workflow in `.github/workflows/cloudflare-pages.yml`. Add these repository secrets before running it:
+GitHub Actions is also prepared as a manual workflow template in `docs/examples/cloudflare-pages.workflow.yml`. After the GitHub token has `workflow` scope, copy it to `.github/workflows/cloudflare-pages.yml` and add these repository secrets before running it:
 
 ```text
 CLOUDFLARE_API_TOKEN

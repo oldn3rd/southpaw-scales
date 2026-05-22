@@ -30,7 +30,7 @@ The public static-hosting target is Cloudflare Pages:
 - output directory: `dist`
 - custom hostname: `guitar.denley.nz`
 
-Manual deployment is prepared through `npm run deploy:cloudflare`. A manual GitHub Actions deployment is prepared in `.github/workflows/cloudflare-pages.yml` and requires `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` repository secrets.
+Manual deployment is prepared through `npm run deploy:cloudflare`. A manual GitHub Actions deployment template is prepared in `docs/examples/cloudflare-pages.workflow.yml` and requires `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` repository secrets once promoted into `.github/workflows`.
 
 ### Kubernetes
 

@@ -23,7 +23,9 @@ Manual deploy:
 npm run deploy:cloudflare
 ```
 
-The manual GitHub Actions deploy requires these GitHub repository secrets:
+The manual GitHub Actions deploy template is in `docs/examples/cloudflare-pages.workflow.yml`. After the GitHub token has `workflow` scope, copy it to `.github/workflows/cloudflare-pages.yml`.
+
+It requires these GitHub repository secrets:
 
 ```text
 CLOUDFLARE_API_TOKEN
