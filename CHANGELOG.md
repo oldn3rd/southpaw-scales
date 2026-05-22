@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.5
+
+- Rebranded the app as Southpaw Scales.
+- Added Cloudflare Pages deployment config, npm deploy script, and GitHub Actions workflow.
+- Documented the public static-hosting path for `guitar.denley.nz`.
+
 ## 0.1.4
 
 - Added a key-aware 12-bar blues practice loop with Play, Pause, Stop, and current-bar highlighting.

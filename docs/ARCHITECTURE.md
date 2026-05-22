@@ -1,5 +1,9 @@
 # Architecture
 
+## Product
+
+Southpaw Scales is a static guitar theory and practice app served at `guitar.denley.nz`.
+
 ## Runtime
 
 The app is a static React/Vite single-page app served by nginx on port `8080`.
@@ -13,8 +17,22 @@ The app is a static React/Vite single-page app served by nginx on port `8080`.
 - relative mode rows are derived from the selected mode's parent major key
 - fretboard notes are generated from standard tuning through fret 12
 - left-handed rendering mirrors fret order while keeping the same generated notes
+- 12-bar blues practice rows are generated from key-aware I7, IV7, and V7 dominant chords
 
 ## Deployment
+
+### Cloudflare Pages
+
+The public static-hosting target is Cloudflare Pages:
+
+- project name: `southpaw-scales`
+- build command: `npm run build`
+- output directory: `dist`
+- custom hostname: `guitar.denley.nz`
+
+Manual deployment is prepared through `npm run deploy:cloudflare`. A manual GitHub Actions deployment is prepared in `.github/workflows/cloudflare-pages.yml` and requires `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` repository secrets.
+
+### Kubernetes
 
 Kubernetes manifests live in `deploy/kubernetes` and use:
 

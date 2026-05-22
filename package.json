@@ -1,11 +1,12 @@
 {
-  "name": "guitar-scale-generator",
-  "version": "0.1.4",
+  "name": "southpaw-scales",
+  "version": "0.1.5",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "tsc -b && vite build",
+    "deploy:cloudflare": "npm run build && wrangler pages deploy dist --project-name southpaw-scales",
     "preview": "vite preview --host 0.0.0.0",
     "test": "vitest run"
   },
@@ -14,11 +15,12 @@
     "react-dom": "^19.2.3"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^5.1.1",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.1",
     "typescript": "^5.9.3",
     "vite": "^7.2.7",
-    "vitest": "^4.0.15"
+    "vitest": "^4.0.15",
+    "wrangler": "^4.93.1"
   }
 }

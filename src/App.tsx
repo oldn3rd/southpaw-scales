@@ -143,7 +143,7 @@ export default function App() {
       <section className="topbar" aria-label="Scale controls">
         <div>
           <p className="eyebrow">guitar.denley.nz</p>
-          <h1>Guitar Scale Generator</h1>
+          <h1>Southpaw Scales</h1>
         </div>
 
         <div className="controls">

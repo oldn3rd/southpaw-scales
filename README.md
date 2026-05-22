@@ -1,6 +1,6 @@
-# Guitar Scale Generator
+# Southpaw Scales
 
-Colourful web app for exploring guitar scales, modes, relative keys, and left-handed or right-handed fretboard views.
+Colourful web app for exploring guitar scales, modes, chords, blues practice loops, and left-handed or right-handed fretboard views.
 
 ## Features
 
@@ -8,6 +8,8 @@ Colourful web app for exploring guitar scales, modes, relative keys, and left-ha
 - Generate only the notes that belong to the selected key and mode.
 - Toggle between right-handed and left-handed fretboard orientation.
 - Compare related modal rows from the shared parent major key.
+- Practice a slow key-aware 12-bar blues loop with I7, IV7, and V7 chord playback.
+- Deploy as a static Cloudflare Pages site or as an nginx container in Kubernetes.
 - Container-ready static web app for Kubernetes ingress at `guitar.denley.nz`.
 
 ## Local Development
@@ -26,10 +28,29 @@ npm test
 npm run build
 ```
 
+## Cloudflare Pages
+
+The app is static and can be hosted on Cloudflare Pages at `guitar.denley.nz`.
+
+Manual deploy, once the Cloudflare token has Pages edit access:
+
+```bash
+npm run deploy:cloudflare
+```
+
+GitHub Actions is also prepared as a manual workflow in `.github/workflows/cloudflare-pages.yml`. Add these repository secrets before running it:
+
+```text
+CLOUDFLARE_API_TOKEN
+CLOUDFLARE_ACCOUNT_ID
+```
+
+The current Cloudflare account ID is `00a81954913ed3315c60cec2bc57a8b8`.
+
 ## Container
 
 ```bash
-docker build -t git.denley.nz/oldn3rd/guitar-scale-generator:0.1.4 .
+docker build -t git.denley.nz/oldn3rd/guitar-scale-generator:0.1.5 .
 ```
 
 Push that image to the registry your cluster can pull from, then deploy:
@@ -51,4 +72,4 @@ Create this record in the authoritative `denley.nz` zone:
 guitar.denley.nz. 3600 IN A 10.7.3.202
 ```
 
-If the intended hostname really is `guitar.dinly.nz`, update `deploy/kubernetes/ingress.yaml` and create the equivalent record in the `dinly.nz` zone.
+For Cloudflare Pages, replace the current public `A` record with the custom-domain record Cloudflare creates for the Pages project.
