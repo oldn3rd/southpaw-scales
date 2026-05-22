@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  CIRCLE_OF_FIFTHS,
   getDiatonicSeventhChords,
   getDiatonicTriads,
   getFretboard,
@@ -7,6 +8,7 @@ import {
   getParallelChordRows,
   getRelativeModes,
   getScaleNotes,
+  getScaleIntervals,
   orderFrets
 } from "../src/music";
 
@@ -74,6 +76,22 @@ describe("music theory helpers", () => {
       "Am",
       "Bdim"
     ]);
+  });
+
+  it("builds interval tables for the selected mode", () => {
+    expect(getScaleIntervals("C", "lydian").map((item) => `${item.degree}:${item.note}:${item.label}`)).toEqual([
+      "1:C:1",
+      "2:D:2",
+      "3:E:3",
+      "4:F#:#4",
+      "5:G:5",
+      "6:A:6",
+      "7:B:7"
+    ]);
+  });
+
+  it("keeps circle of fifths keys in fifth order", () => {
+    expect(CIRCLE_OF_FIFTHS).toEqual(["C", "G", "D", "A", "E", "B", "F#", "C#", "G#", "D#", "A#", "F"]);
   });
 
   it("builds parallel chord rows from the selected root", () => {

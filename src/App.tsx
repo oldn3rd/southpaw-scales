@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { CSSProperties } from "react";
 import {
   CHROMATIC_SHARP,
+  CIRCLE_OF_FIFTHS,
   Handedness,
   MODES,
   NoteName,
@@ -12,12 +13,14 @@ import {
   getParentMajorKey,
   getRelativeModes,
   getScaleNotes,
+  getScaleIntervals,
   intervalLabel,
   orderFrets
 } from "./music";
 
 const fretNumbers = Array.from({ length: 13 }, (_, fret) => fret);
 const handednessStorageKey = "guitar-scale-generator-handedness";
+const chordToneLabels = ["R", "3", "5", "7"] as const;
 
 function getStoredHandedness(): Handedness {
   if (typeof window === "undefined") return "right";
@@ -31,6 +34,7 @@ export default function App() {
 
   const mode = getMode(modeId);
   const scaleNotes = useMemo(() => getScaleNotes(root, modeId), [root, modeId]);
+  const scaleIntervals = useMemo(() => getScaleIntervals(root, modeId), [root, modeId]);
   const parentMajor = useMemo(() => getParentMajorKey(root, modeId), [root, modeId]);
   const seventhChords = useMemo(() => getDiatonicSeventhChords(root, modeId), [root, modeId]);
   const selectedChordSymbols = useMemo(() => new Set(seventhChords.map((chord) => chord.symbol)), [seventhChords]);
@@ -130,6 +134,53 @@ export default function App() {
         </div>
       </section>
 
+      <div className="theory-layout">
+        <section className="interval-panel" aria-label={`${root} ${mode.name} intervals`}>
+          <div className="panel-heading">
+            <div>
+              <span className="card-label">Intervals</span>
+              <h2>{root} {mode.name}</h2>
+            </div>
+          </div>
+          <div className="interval-table">
+            <div className="interval-heading">Degree</div>
+            <div className="interval-heading">Note</div>
+            <div className="interval-heading">Interval</div>
+            <div className="interval-heading">Steps</div>
+            {scaleIntervals.map((item) => (
+              <div className="interval-row" key={`${item.degree}-${item.note}`}>
+                <span>{item.degree}</span>
+                <strong>{item.note}</strong>
+                <span>{item.label}</span>
+                <span>{item.semitones}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="circle-panel" aria-label="Circle of fifths">
+          <div className="panel-heading">
+            <div>
+              <span className="card-label">Circle of fifths</span>
+              <h2>Key Wheel</h2>
+            </div>
+          </div>
+          <div className="fifths-wheel">
+            {CIRCLE_OF_FIFTHS.map((note, index) => (
+              <button
+                className={root === note ? "active" : ""}
+                key={note}
+                onClick={() => setRoot(note)}
+                style={{ "--slot": index } as CSSProperties}
+                type="button"
+              >
+                {note}
+              </button>
+            ))}
+          </div>
+        </section>
+      </div>
+
       <section className="chord-panel" aria-label={`${root} ${mode.name} seventh chords`}>
         <div className="panel-heading">
           <div>
@@ -144,8 +195,14 @@ export default function App() {
               <strong>{chord.symbol}</strong>
               <small>{chord.quality}</small>
               <div className="chord-notes">
-                {chord.notes.map((note) => (
-                  <span key={`${chord.symbol}-${note}`}>{note}</span>
+                {chord.notes.map((note, noteIndex) => (
+                  <span
+                    className={`tone-${chordToneLabels[noteIndex].toLowerCase()}`}
+                    key={`${chord.symbol}-${note}`}
+                  >
+                    <b>{note}</b>
+                    <small>{chordToneLabels[noteIndex]}</small>
+                  </span>
                 ))}
               </div>
             </article>

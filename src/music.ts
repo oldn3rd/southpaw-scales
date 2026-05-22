@@ -42,6 +42,13 @@ export type TriadChord = {
   notes: NoteName[];
 };
 
+export type ScaleInterval = {
+  degree: number;
+  note: NoteName;
+  semitones: number;
+  label: string;
+};
+
 export type ParallelChordRow = {
   mode: Mode;
   chords: SeventhChord[];
@@ -58,6 +65,7 @@ export const MODES: Mode[] = [
 ];
 
 export const STANDARD_TUNING: NoteName[] = ["E", "A", "D", "G", "B", "E"];
+export const CIRCLE_OF_FIFTHS: NoteName[] = ["C", "G", "D", "A", "E", "B", "F#", "C#", "G#", "D#", "A#", "F"];
 
 export function normalizeNote(input: string): NoteName {
   const normalized = input.trim().replace("♯", "#").replace("♭", "b");
@@ -91,6 +99,16 @@ export function getMode(id: string): Mode {
 export function getScaleNotes(root: NoteName, modeId: string): NoteName[] {
   const mode = getMode(modeId);
   return mode.intervals.map((interval) => transpose(root, interval));
+}
+
+export function getScaleIntervals(root: NoteName, modeId: string): ScaleInterval[] {
+  const mode = getMode(modeId);
+  return mode.intervals.map((semitones, index) => ({
+    degree: index + 1,
+    note: transpose(root, semitones),
+    semitones,
+    label: intervalLabel(semitones)
+  }));
 }
 
 export function getParentMajorKey(root: NoteName, modeId: string): NoteName {

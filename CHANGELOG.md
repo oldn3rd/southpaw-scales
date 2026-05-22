@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.2
+
+- Added colour-coded root, third, fifth, and seventh chord-tone badges.
+- Added an interval table for the selected key and mode.
+- Added a clickable circle of fifths key wheel.
+
 ## 0.1.1
 
 - Added persisted handedness preference using browser local storage.

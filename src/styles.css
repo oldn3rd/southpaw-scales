@@ -132,6 +132,7 @@ h2 {
 }
 
 .summary-band,
+.theory-layout,
 .chord-panel,
 .fretboard-panel,
 .harmony-layout {
@@ -147,6 +148,8 @@ h2 {
 
 .scale-card,
 .key-context,
+.interval-panel,
+.circle-panel,
 .chord-panel,
 .fretboard-panel,
 .relationship-panel,
@@ -218,10 +221,104 @@ h2 {
 }
 
 .fretboard-panel,
+.interval-panel,
+.circle-panel,
 .relationship-panel,
 .borrow-panel,
 .chord-panel {
   padding: 20px;
+}
+
+.theory-layout {
+  display: grid;
+  grid-template-columns: minmax(420px, 1fr) minmax(320px, 0.62fr);
+  gap: 16px;
+  align-items: stretch;
+}
+
+.interval-table {
+  display: grid;
+  grid-template-columns: 0.8fr 1fr 1fr 0.8fr;
+  gap: 6px;
+}
+
+.interval-heading {
+  color: #607085;
+  font-size: 0.75rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.interval-row {
+  display: contents;
+}
+
+.interval-row span,
+.interval-row strong {
+  display: grid;
+  place-items: center;
+  min-height: 38px;
+  border-radius: 8px;
+  background: #eef3fa;
+  color: #253247;
+  font-weight: 900;
+}
+
+.interval-row strong {
+  background: #18212f;
+  color: #ffffff;
+}
+
+.fifths-wheel {
+  position: relative;
+  width: min(100%, 340px);
+  aspect-ratio: 1;
+  margin: 0 auto;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at center, #ffffff 0 31%, transparent 32%),
+    conic-gradient(from -15deg, #e85d75, #ef7b45, #ffc857, #10a37f, #3fbbc4, #4f8cff, #9d6cff, #db4cb2, #e85d75);
+  box-shadow: inset 0 0 0 1px #dce3ed;
+}
+
+.fifths-wheel::after {
+  content: "5ths";
+  position: absolute;
+  inset: 36%;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #607085;
+  font-weight: 900;
+}
+
+.fifths-wheel button {
+  --angle: calc((var(--slot) * 30deg) - 90deg);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 42px;
+  border: 2px solid #ffffff;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #18212f;
+  cursor: pointer;
+  font-weight: 900;
+  transform:
+    translate(-50%, -50%)
+    rotate(var(--angle))
+    translateY(-132px)
+    rotate(calc(-1 * var(--angle)));
+  box-shadow: 0 7px 18px rgba(24, 33, 47, 0.14);
+}
+
+.fifths-wheel button.active {
+  background: #18212f;
+  color: #ffffff;
 }
 
 .chord-grid {
@@ -267,12 +364,43 @@ h2 {
 .chord-notes span {
   display: grid;
   place-items: center;
-  min-width: 30px;
-  min-height: 28px;
+  grid-template-columns: 1fr;
+  min-width: 38px;
+  min-height: 42px;
   border-radius: 8px;
   background: #eef3fa;
   font-size: 0.82rem;
   font-weight: 900;
+}
+
+.chord-notes b,
+.chord-notes small {
+  line-height: 1;
+}
+
+.chord-notes small {
+  font-size: 0.62rem;
+  opacity: 0.85;
+}
+
+.chord-notes .tone-r {
+  background: #e85d75;
+  color: #ffffff;
+}
+
+.chord-notes .tone-3 {
+  background: #10a37f;
+  color: #ffffff;
+}
+
+.chord-notes .tone-5 {
+  background: #4f8cff;
+  color: #ffffff;
+}
+
+.chord-notes .tone-7 {
+  background: #9d6cff;
+  color: #ffffff;
 }
 
 .panel-heading {
@@ -537,6 +665,7 @@ h2 {
 @media (max-width: 900px) {
   .topbar,
   .summary-band,
+  .theory-layout,
   .scale-card,
   .harmony-layout,
   .mode-row,
@@ -585,6 +714,18 @@ h2 {
 
   .fretboard {
     grid-template-columns: 46px repeat(13, 64px);
+  }
+
+  .interval-table {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .fifths-wheel button {
+    transform:
+      translate(-50%, -50%)
+      rotate(var(--angle))
+      translateY(-112px)
+      rotate(calc(-1 * var(--angle)));
   }
 }
 
