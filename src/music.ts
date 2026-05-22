@@ -55,6 +55,12 @@ export type ParallelChordRow = {
   chords: SeventhChord[];
 };
 
+export type BluesBar = {
+  bar: number;
+  degree: "I7" | "IV7" | "V7";
+  chord: SeventhChord;
+};
+
 export const MODES: Mode[] = [
   { id: "ionian", name: "Ionian", intervals: [0, 2, 4, 5, 7, 9, 11], parentOffset: 0, color: "#e85d75" },
   { id: "dorian", name: "Dorian", intervals: [0, 2, 3, 5, 7, 9, 10], parentOffset: 2, color: "#10a37f" },
@@ -175,6 +181,45 @@ export function getParallelChordRows(root: NoteName): ParallelChordRow[] {
   return MODES.map((mode) => ({
     mode,
     chords: getDiatonicSeventhChords(root, mode.id)
+  }));
+}
+
+export function getDominantSeventhChord(root: NoteName): SeventhChord {
+  const notes = [root, transpose(root, 4), transpose(root, 7), transpose(root, 10)];
+  return {
+    degree: 1,
+    roman: "I7",
+    root,
+    symbol: `${root}7`,
+    quality: "dominant seventh",
+    notes
+  };
+}
+
+export function getTwelveBarBlues(root: NoteName): BluesBar[] {
+  const chords: Record<BluesBar["degree"], SeventhChord> = {
+    I7: { ...getDominantSeventhChord(root), roman: "I7" },
+    IV7: { ...getDominantSeventhChord(transpose(root, 5)), roman: "IV7", degree: 4 },
+    V7: { ...getDominantSeventhChord(transpose(root, 7)), roman: "V7", degree: 5 }
+  };
+  const form: BluesBar["degree"][] = [
+    "I7",
+    "I7",
+    "I7",
+    "I7",
+    "IV7",
+    "IV7",
+    "I7",
+    "I7",
+    "V7",
+    "IV7",
+    "I7",
+    "V7"
+  ];
+  return form.map((degree, index) => ({
+    bar: index + 1,
+    degree,
+    chord: chords[degree]
   }));
 }
 

@@ -134,6 +134,7 @@ h2 {
 .summary-band,
 .theory-layout,
 .chord-panel,
+.blues-panel,
 .fretboard-panel,
 .harmony-layout {
   max-width: 1680px;
@@ -151,6 +152,7 @@ h2 {
 .interval-panel,
 .circle-panel,
 .chord-panel,
+.blues-panel,
 .fretboard-panel,
 .relationship-panel,
 .borrow-panel {
@@ -225,8 +227,106 @@ h2 {
 .circle-panel,
 .relationship-panel,
 .borrow-panel,
+.blues-panel,
 .chord-panel {
   padding: 20px;
+}
+
+.blues-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.blues-controls span,
+.blues-controls button {
+  min-height: 40px;
+  border-radius: 8px;
+  font-weight: 900;
+}
+
+.blues-controls span {
+  display: grid;
+  place-items: center;
+  padding: 0 12px;
+  background: #eef3fa;
+  color: #253247;
+}
+
+.blues-controls button {
+  min-width: 82px;
+  border: 0;
+  background: #18212f;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.blues-controls button + button {
+  border: 1px solid #d4dce8;
+  background: #ffffff;
+  color: #18212f;
+}
+
+.blues-now {
+  display: grid;
+  grid-template-columns: auto auto minmax(180px, 1fr);
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 12px;
+  padding: 12px;
+  border-left: 6px solid var(--accent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--accent) 12%, white);
+}
+
+.blues-now span,
+.blues-now small {
+  color: #59697d;
+  font-weight: 900;
+}
+
+.blues-now strong {
+  color: #18212f;
+  font-size: 1.65rem;
+}
+
+.blues-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(78px, 1fr));
+  gap: 8px;
+}
+
+.blues-grid button {
+  display: grid;
+  gap: 4px;
+  justify-items: center;
+  min-height: 86px;
+  padding: 10px;
+  border: 1px solid #d7dfeb;
+  border-radius: 8px;
+  background: #eef3fa;
+  color: #253247;
+  cursor: pointer;
+}
+
+.blues-grid button.active {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #ffffff;
+  box-shadow: 0 10px 22px rgba(24, 33, 47, 0.14);
+}
+
+.blues-grid span,
+.blues-grid small {
+  font-size: 0.78rem;
+  font-weight: 900;
+  opacity: 0.9;
+}
+
+.blues-grid strong {
+  font-size: 1.2rem;
 }
 
 .theory-layout {
@@ -685,9 +785,14 @@ h2 {
   .theory-layout,
   .scale-card,
   .harmony-layout,
+  .blues-now,
   .mode-row,
   .parallel-row {
     grid-template-columns: 1fr;
+  }
+
+  .blues-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .available-chords {
@@ -735,6 +840,14 @@ h2 {
 
   .interval-table {
     grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .blues-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .blues-controls {
+    justify-content: flex-start;
   }
 
   .fifths-wheel button {

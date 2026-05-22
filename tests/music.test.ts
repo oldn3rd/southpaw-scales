@@ -9,6 +9,7 @@ import {
   getRelativeModes,
   getScaleNotes,
   getScaleIntervals,
+  getTwelveBarBlues,
   orderFrets
 } from "../src/music";
 
@@ -106,5 +107,24 @@ describe("music theory helpers", () => {
       "G#maj7",
       "A#7"
     ]);
+  });
+
+  it("builds a 12-bar blues progression in the selected key", () => {
+    const bars = getTwelveBarBlues("B");
+    expect(bars.map((bar) => `${bar.bar}:${bar.degree}:${bar.chord.symbol}`)).toEqual([
+      "1:I7:B7",
+      "2:I7:B7",
+      "3:I7:B7",
+      "4:I7:B7",
+      "5:IV7:E7",
+      "6:IV7:E7",
+      "7:I7:B7",
+      "8:I7:B7",
+      "9:V7:F#7",
+      "10:IV7:E7",
+      "11:I7:B7",
+      "12:V7:F#7"
+    ]);
+    expect(bars[0].chord.notes).toEqual(["B", "D#", "F#", "A"]);
   });
 });

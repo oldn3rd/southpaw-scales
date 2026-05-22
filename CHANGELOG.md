@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.4
+
+- Added a key-aware 12-bar blues practice loop with Play, Pause, Stop, and current-bar highlighting.
+- Added soft Web Audio chord playback for I7, IV7, and V7 blues changes.
+- Displayed dominant seventh chord tones with friendlier flat seventh spelling in the practice loop.
+
 ## 0.1.3
 
 - Replaced numeric interval labels with full interval names.

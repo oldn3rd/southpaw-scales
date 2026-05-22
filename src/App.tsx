@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import {
   CHROMATIC_SHARP,
@@ -14,6 +14,7 @@ import {
   getRelativeModes,
   getScaleNotes,
   getScaleIntervals,
+  getTwelveBarBlues,
   intervalLabel,
   orderFrets
 } from "./music";
@@ -21,16 +22,53 @@ import {
 const fretNumbers = Array.from({ length: 13 }, (_, fret) => fret);
 const handednessStorageKey = "guitar-scale-generator-handedness";
 const chordToneLabels = ["R", "3", "5", "7"] as const;
+const bluesBpm = 68;
+const bluesBarMs = (60_000 / bluesBpm) * 4;
+const flatDisplayNames: Record<NoteName, string> = {
+  C: "C",
+  "C#": "Db",
+  D: "D",
+  "D#": "Eb",
+  E: "E",
+  F: "F",
+  "F#": "Gb",
+  G: "G",
+  "G#": "Ab",
+  A: "A",
+  "A#": "Bb",
+  B: "B"
+};
 
 function getStoredHandedness(): Handedness {
   if (typeof window === "undefined") return "right";
   return window.localStorage.getItem(handednessStorageKey) === "left" ? "left" : "right";
 }
 
+function getAudioContext(): AudioContext {
+  const AudioContextClass =
+    window.AudioContext ?? (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+  return new AudioContextClass();
+}
+
+function noteFrequency(note: NoteName, chordRoot: NoteName): number {
+  const rootIndex = CHROMATIC_SHARP.indexOf(chordRoot);
+  const noteIndex = CHROMATIC_SHARP.indexOf(note);
+  const semitonesAboveRoot = (noteIndex - rootIndex + 12) % 12;
+  const midi = 48 + rootIndex + semitonesAboveRoot;
+  return 440 * 2 ** ((midi - 69) / 12);
+}
+
+function displayDominantChordNote(note: NoteName, index: number): string {
+  return index === 3 ? flatDisplayNames[note] : note;
+}
+
 export default function App() {
   const [root, setRoot] = useState<NoteName>("C");
   const [modeId, setModeId] = useState("ionian");
   const [handedness, setHandedness] = useState<Handedness>(getStoredHandedness);
+  const [isBluesPlaying, setIsBluesPlaying] = useState(false);
+  const [currentBluesBar, setCurrentBluesBar] = useState(0);
+  const audioContextRef = useRef<AudioContext | null>(null);
 
   const mode = getMode(modeId);
   const scaleNotes = useMemo(() => getScaleNotes(root, modeId), [root, modeId]);
@@ -41,6 +79,8 @@ export default function App() {
   const parallelChordRows = useMemo(() => getParallelChordRows(root), [root]);
   const fretboard = useMemo(() => getFretboard(root, modeId), [root, modeId]);
   const relativeModes = useMemo(() => getRelativeModes(root, modeId), [root, modeId]);
+  const bluesProgression = useMemo(() => getTwelveBarBlues(root), [root]);
+  const activeBluesBar = bluesProgression[currentBluesBar];
   const relativeModeByRoot = useMemo(
     () => new Map(relativeModes.map((row) => [row.root, row.mode])),
     [relativeModes]
@@ -50,6 +90,53 @@ export default function App() {
   useEffect(() => {
     window.localStorage.setItem(handednessStorageKey, handedness);
   }, [handedness]);
+
+  useEffect(() => {
+    if (!isBluesPlaying) return undefined;
+    const chord = bluesProgression[currentBluesBar].chord;
+    const audioContext = audioContextRef.current;
+    if (audioContext) {
+      const startTime = audioContext.currentTime + 0.02;
+      chord.notes.forEach((note, index) => {
+        const oscillator = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        oscillator.type = index === 0 ? "triangle" : "sine";
+        oscillator.frequency.setValueAtTime(noteFrequency(note, chord.root), startTime);
+        gain.gain.setValueAtTime(0, startTime + index * 0.035);
+        gain.gain.linearRampToValueAtTime(0.045, startTime + 0.12 + index * 0.035);
+        gain.gain.linearRampToValueAtTime(0.018, startTime + 1.7);
+        gain.gain.linearRampToValueAtTime(0, startTime + 3.15);
+        oscillator.connect(gain);
+        gain.connect(audioContext.destination);
+        oscillator.start(startTime + index * 0.035);
+        oscillator.stop(startTime + 3.2);
+      });
+    }
+
+    const timer = window.setTimeout(() => {
+      setCurrentBluesBar((bar) => (bar + 1) % bluesProgression.length);
+    }, bluesBarMs);
+    return () => window.clearTimeout(timer);
+  }, [bluesProgression, currentBluesBar, isBluesPlaying]);
+
+  async function startBlues() {
+    if (!audioContextRef.current) {
+      audioContextRef.current = getAudioContext();
+    }
+    if (audioContextRef.current.state === "suspended") {
+      await audioContextRef.current.resume();
+    }
+    setIsBluesPlaying(true);
+  }
+
+  function pauseBlues() {
+    setIsBluesPlaying(false);
+  }
+
+  function stopBlues() {
+    setIsBluesPlaying(false);
+    setCurrentBluesBar(0);
+  }
 
   return (
     <main className="app-shell">
@@ -135,6 +222,44 @@ export default function App() {
             This view keeps modes inside their shared parent key, so the rows below show how the same notes
             reorganize around different roots.
           </p>
+        </div>
+      </section>
+
+      <section className="blues-panel" aria-label={`${root} twelve-bar blues practice`}>
+        <div className="panel-heading">
+          <div>
+            <span className="card-label">Practice loop</span>
+            <h2>{root} 12-Bar Blues</h2>
+          </div>
+          <div className="blues-controls">
+            <span>{bluesBpm} BPM</span>
+            <button onClick={isBluesPlaying ? pauseBlues : startBlues} type="button">
+              {isBluesPlaying ? "Pause" : "Play"}
+            </button>
+            <button onClick={stopBlues} type="button">Stop</button>
+          </div>
+        </div>
+        <div className="blues-now" style={{ "--accent": mode.color } as CSSProperties}>
+          <span>Bar {activeBluesBar.bar}</span>
+          <strong>{activeBluesBar.chord.symbol}</strong>
+          <small>
+            {activeBluesBar.degree} · {activeBluesBar.chord.notes.map(displayDominantChordNote).join(" ")}
+          </small>
+        </div>
+        <div className="blues-grid">
+          {bluesProgression.map((bar, index) => (
+            <button
+              className={index === currentBluesBar ? "active" : ""}
+              key={`${bar.bar}-${bar.degree}`}
+              onClick={() => setCurrentBluesBar(index)}
+              style={{ "--accent": mode.color } as CSSProperties}
+              type="button"
+            >
+              <span>{bar.bar}</span>
+              <strong>{bar.chord.symbol}</strong>
+              <small>{bar.degree}</small>
+            </button>
+          ))}
         </div>
       </section>
 
