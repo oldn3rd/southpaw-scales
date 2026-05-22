@@ -47,6 +47,7 @@ export type ScaleInterval = {
   note: NoteName;
   semitones: number;
   label: string;
+  name: string;
 };
 
 export type ParallelChordRow = {
@@ -107,7 +108,8 @@ export function getScaleIntervals(root: NoteName, modeId: string): ScaleInterval
     degree: index + 1,
     note: transpose(root, semitones),
     semitones,
-    label: intervalLabel(semitones)
+    label: intervalLabel(semitones),
+    name: intervalName(semitones)
   }));
 }
 
@@ -216,6 +218,24 @@ export function intervalLabel(interval: number): string {
     11: "7"
   };
   return labels[interval] ?? "";
+}
+
+export function intervalName(interval: number): string {
+  const names: Record<number, string> = {
+    0: "Perfect unison",
+    1: "Minor second",
+    2: "Major second",
+    3: "Minor third",
+    4: "Major third",
+    5: "Perfect fourth",
+    6: "Tritone",
+    7: "Perfect fifth",
+    8: "Minor sixth",
+    9: "Major sixth",
+    10: "Minor seventh",
+    11: "Major seventh"
+  };
+  return names[interval] ?? "";
 }
 
 function getRole(interval: number, inScale: boolean): FretNote["role"] {

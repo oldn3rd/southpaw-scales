@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.3
+
+- Replaced numeric interval labels with full interval names.
+- Matched circle-of-fifths key colours to the current parent key's modal colours.
+
 ## 0.1.2
 
 - Added colour-coded root, third, fifth, and seventh chord-tone badges.

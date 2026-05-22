@@ -41,6 +41,10 @@ export default function App() {
   const parallelChordRows = useMemo(() => getParallelChordRows(root), [root]);
   const fretboard = useMemo(() => getFretboard(root, modeId), [root, modeId]);
   const relativeModes = useMemo(() => getRelativeModes(root, modeId), [root, modeId]);
+  const relativeModeByRoot = useMemo(
+    () => new Map(relativeModes.map((row) => [row.root, row.mode])),
+    [relativeModes]
+  );
   const orderedFrets = orderFrets(fretNumbers, handedness);
 
   useEffect(() => {
@@ -145,13 +149,13 @@ export default function App() {
           <div className="interval-table">
             <div className="interval-heading">Degree</div>
             <div className="interval-heading">Note</div>
-            <div className="interval-heading">Interval</div>
+            <div className="interval-heading">Interval name</div>
             <div className="interval-heading">Steps</div>
             {scaleIntervals.map((item) => (
               <div className="interval-row" key={`${item.degree}-${item.note}`}>
                 <span>{item.degree}</span>
                 <strong>{item.note}</strong>
-                <span>{item.label}</span>
+                <span>{item.name}</span>
                 <span>{item.semitones}</span>
               </div>
             ))}
@@ -166,17 +170,24 @@ export default function App() {
             </div>
           </div>
           <div className="fifths-wheel">
-            {CIRCLE_OF_FIFTHS.map((note, index) => (
-              <button
-                className={root === note ? "active" : ""}
-                key={note}
-                onClick={() => setRoot(note)}
-                style={{ "--slot": index } as CSSProperties}
-                type="button"
-              >
-                {note}
-              </button>
-            ))}
+            {CIRCLE_OF_FIFTHS.map((note, index) => {
+              const relatedMode = relativeModeByRoot.get(note);
+              return (
+                <button
+                  className={`${root === note ? "active" : ""} ${relatedMode ? "in-key" : ""}`}
+                  key={note}
+                  onClick={() => setRoot(note)}
+                  style={{
+                    "--slot": index,
+                    "--key-color": relatedMode?.color ?? "#eef3fa"
+                  } as CSSProperties}
+                  title={relatedMode ? `${note} ${relatedMode.name}` : `${note} outside ${parentMajor} major`}
+                  type="button"
+                >
+                  {note}
+                </button>
+              );
+            })}
           </div>
         </section>
       </div>

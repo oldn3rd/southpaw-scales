@@ -79,14 +79,14 @@ describe("music theory helpers", () => {
   });
 
   it("builds interval tables for the selected mode", () => {
-    expect(getScaleIntervals("C", "lydian").map((item) => `${item.degree}:${item.note}:${item.label}`)).toEqual([
-      "1:C:1",
-      "2:D:2",
-      "3:E:3",
-      "4:F#:#4",
-      "5:G:5",
-      "6:A:6",
-      "7:B:7"
+    expect(getScaleIntervals("C", "lydian").map((item) => `${item.degree}:${item.note}:${item.name}`)).toEqual([
+      "1:C:Perfect unison",
+      "2:D:Major second",
+      "3:E:Major third",
+      "4:F#:Tritone",
+      "5:G:Perfect fifth",
+      "6:A:Major sixth",
+      "7:B:Major seventh"
     ]);
   });
 
