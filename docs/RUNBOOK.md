@@ -43,7 +43,7 @@ After the Pages project exists, attach `guitar.denley.nz` as a custom domain in 
 ## Build Image
 
 ```bash
-docker build -t git.denley.nz/oldn3rd/guitar-scale-generator:0.1.5 .
+docker build -t git.denley.nz/oldn3rd/guitar-scale-generator:0.1.6 .
 ```
 
 For the current homelab deployment, the image is built on `kccontrol` and imported into k3s containerd there. The deployment is pinned to `kccontrol` until registry-based image pulls are configured.

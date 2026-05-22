@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.6
+
+- Moved the 12-bar blues practice loop to the bottom of the page.
+- Added a click track and four-beat visual meter to blues playback.
+
 ## 0.1.5
 
 - Rebranded the app as Southpaw Scales.

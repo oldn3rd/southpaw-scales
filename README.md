@@ -8,7 +8,7 @@ Colourful web app for exploring guitar scales, modes, chords, blues practice loo
 - Generate only the notes that belong to the selected key and mode.
 - Toggle between right-handed and left-handed fretboard orientation.
 - Compare related modal rows from the shared parent major key.
-- Practice a slow key-aware 12-bar blues loop with I7, IV7, and V7 chord playback.
+- Practice a slow key-aware 12-bar blues loop with I7, IV7, V7 chord playback, and a click track.
 - Deploy as a static Cloudflare Pages site or as an nginx container in Kubernetes.
 - Container-ready static web app for Kubernetes ingress at `guitar.denley.nz`.
 
@@ -50,7 +50,7 @@ The current Cloudflare account ID is `00a81954913ed3315c60cec2bc57a8b8`.
 ## Container
 
 ```bash
-docker build -t git.denley.nz/oldn3rd/guitar-scale-generator:0.1.5 .
+docker build -t git.denley.nz/oldn3rd/guitar-scale-generator:0.1.6 .
 ```
 
 Push that image to the registry your cluster can pull from, then deploy:

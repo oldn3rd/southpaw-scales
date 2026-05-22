@@ -23,7 +23,8 @@ const fretNumbers = Array.from({ length: 13 }, (_, fret) => fret);
 const handednessStorageKey = "guitar-scale-generator-handedness";
 const chordToneLabels = ["R", "3", "5", "7"] as const;
 const bluesBpm = 68;
-const bluesBarMs = (60_000 / bluesBpm) * 4;
+const bluesBeatMs = 60_000 / bluesBpm;
+const bluesBarMs = bluesBeatMs * 4;
 const flatDisplayNames: Record<NoteName, string> = {
   C: "C",
   "C#": "Db",
@@ -68,6 +69,7 @@ export default function App() {
   const [handedness, setHandedness] = useState<Handedness>(getStoredHandedness);
   const [isBluesPlaying, setIsBluesPlaying] = useState(false);
   const [currentBluesBar, setCurrentBluesBar] = useState(0);
+  const [currentBluesBeat, setCurrentBluesBeat] = useState(0);
   const audioContextRef = useRef<AudioContext | null>(null);
 
   const mode = getMode(modeId);
@@ -95,6 +97,9 @@ export default function App() {
     if (!isBluesPlaying) return undefined;
     const chord = bluesProgression[currentBluesBar].chord;
     const audioContext = audioContextRef.current;
+    const beatTimers: number[] = [];
+    setCurrentBluesBeat(0);
+
     if (audioContext) {
       const startTime = audioContext.currentTime + 0.02;
       chord.notes.forEach((note, index) => {
@@ -111,12 +116,34 @@ export default function App() {
         oscillator.start(startTime + index * 0.035);
         oscillator.stop(startTime + 3.2);
       });
+
+      Array.from({ length: 4 }, (_, beat) => beat).forEach((beat) => {
+        const clickTime = startTime + beat * (bluesBeatMs / 1000);
+        const oscillator = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        oscillator.type = "square";
+        oscillator.frequency.setValueAtTime(beat === 0 ? 1320 : 880, clickTime);
+        gain.gain.setValueAtTime(0, clickTime);
+        gain.gain.linearRampToValueAtTime(beat === 0 ? 0.075 : 0.052, clickTime + 0.006);
+        gain.gain.exponentialRampToValueAtTime(0.001, clickTime + 0.07);
+        oscillator.connect(gain);
+        gain.connect(audioContext.destination);
+        oscillator.start(clickTime);
+        oscillator.stop(clickTime + 0.08);
+      });
+    }
+
+    for (let beat = 1; beat < 4; beat += 1) {
+      beatTimers.push(window.setTimeout(() => setCurrentBluesBeat(beat), bluesBeatMs * beat));
     }
 
     const timer = window.setTimeout(() => {
       setCurrentBluesBar((bar) => (bar + 1) % bluesProgression.length);
     }, bluesBarMs);
-    return () => window.clearTimeout(timer);
+    return () => {
+      window.clearTimeout(timer);
+      beatTimers.forEach((beatTimer) => window.clearTimeout(beatTimer));
+    };
   }, [bluesProgression, currentBluesBar, isBluesPlaying]);
 
   async function startBlues() {
@@ -136,6 +163,7 @@ export default function App() {
   function stopBlues() {
     setIsBluesPlaying(false);
     setCurrentBluesBar(0);
+    setCurrentBluesBeat(0);
   }
 
   return (
@@ -222,44 +250,6 @@ export default function App() {
             This view keeps modes inside their shared parent key, so the rows below show how the same notes
             reorganize around different roots.
           </p>
-        </div>
-      </section>
-
-      <section className="blues-panel" aria-label={`${root} twelve-bar blues practice`}>
-        <div className="panel-heading">
-          <div>
-            <span className="card-label">Practice loop</span>
-            <h2>{root} 12-Bar Blues</h2>
-          </div>
-          <div className="blues-controls">
-            <span>{bluesBpm} BPM</span>
-            <button onClick={isBluesPlaying ? pauseBlues : startBlues} type="button">
-              {isBluesPlaying ? "Pause" : "Play"}
-            </button>
-            <button onClick={stopBlues} type="button">Stop</button>
-          </div>
-        </div>
-        <div className="blues-now" style={{ "--accent": mode.color } as CSSProperties}>
-          <span>Bar {activeBluesBar.bar}</span>
-          <strong>{activeBluesBar.chord.symbol}</strong>
-          <small>
-            {activeBluesBar.degree} · {activeBluesBar.chord.notes.map(displayDominantChordNote).join(" ")}
-          </small>
-        </div>
-        <div className="blues-grid">
-          {bluesProgression.map((bar, index) => (
-            <button
-              className={index === currentBluesBar ? "active" : ""}
-              key={`${bar.bar}-${bar.degree}`}
-              onClick={() => setCurrentBluesBar(index)}
-              style={{ "--accent": mode.color } as CSSProperties}
-              type="button"
-            >
-              <span>{bar.bar}</span>
-              <strong>{bar.chord.symbol}</strong>
-              <small>{bar.degree}</small>
-            </button>
-          ))}
         </div>
       </section>
 
@@ -459,6 +449,58 @@ export default function App() {
           </div>
         </section>
       </div>
+
+      <section className="blues-panel" aria-label={`${root} twelve-bar blues practice`}>
+        <div className="panel-heading">
+          <div>
+            <span className="card-label">Practice loop</span>
+            <h2>{root} 12-Bar Blues</h2>
+          </div>
+          <div className="blues-controls">
+            <span>{bluesBpm} BPM</span>
+            <span>Click track</span>
+            <button onClick={isBluesPlaying ? pauseBlues : startBlues} type="button">
+              {isBluesPlaying ? "Pause" : "Play"}
+            </button>
+            <button onClick={stopBlues} type="button">Stop</button>
+          </div>
+        </div>
+        <div className="blues-now" style={{ "--accent": mode.color } as CSSProperties}>
+          <span>Bar {activeBluesBar.bar}</span>
+          <strong>{activeBluesBar.chord.symbol}</strong>
+          <small>
+            {activeBluesBar.degree} · {activeBluesBar.chord.notes.map(displayDominantChordNote).join(" ")}
+          </small>
+          <div className="beat-meter" aria-label={`Beat ${currentBluesBeat + 1} of 4`}>
+            {[0, 1, 2, 3].map((beat) => (
+              <span
+                className={beat === currentBluesBeat ? "active" : ""}
+                key={beat}
+              >
+                {beat + 1}
+              </span>
+            ))}
+          </div>
+        </div>
+        <div className="blues-grid">
+          {bluesProgression.map((bar, index) => (
+            <button
+              className={index === currentBluesBar ? "active" : ""}
+              key={`${bar.bar}-${bar.degree}`}
+              onClick={() => {
+                setCurrentBluesBar(index);
+                setCurrentBluesBeat(0);
+              }}
+              style={{ "--accent": mode.color } as CSSProperties}
+              type="button"
+            >
+              <span>{bar.bar}</span>
+              <strong>{bar.chord.symbol}</strong>
+              <small>{bar.degree}</small>
+            </button>
+          ))}
+        </div>
+      </section>
     </main>
   );
 }

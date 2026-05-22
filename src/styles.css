@@ -271,7 +271,7 @@ h2 {
 
 .blues-now {
   display: grid;
-  grid-template-columns: auto auto minmax(180px, 1fr);
+  grid-template-columns: auto auto minmax(180px, 1fr) auto;
   gap: 10px;
   align-items: center;
   margin-bottom: 12px;
@@ -290,6 +290,30 @@ h2 {
 .blues-now strong {
   color: #18212f;
   font-size: 1.65rem;
+}
+
+.beat-meter {
+  display: grid;
+  grid-template-columns: repeat(4, 34px);
+  gap: 6px;
+}
+
+.beat-meter span {
+  display: grid;
+  place-items: center;
+  min-height: 34px;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #59697d;
+  font-size: 0.82rem;
+  font-weight: 900;
+  box-shadow: inset 0 0 0 1px #d7dfeb;
+}
+
+.beat-meter span.active {
+  background: #18212f;
+  color: #ffffff;
+  box-shadow: 0 8px 18px rgba(24, 33, 47, 0.14);
 }
 
 .blues-grid {
