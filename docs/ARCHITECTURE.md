@@ -30,7 +30,9 @@ The public static-hosting target is Cloudflare Pages:
 - output directory: `dist`
 - custom hostname: `guitar.denley.nz`
 
-Manual deployment is prepared through `npm run deploy:cloudflare`. A manual GitHub Actions deployment template is prepared in `docs/examples/cloudflare-pages.workflow.yml` and requires `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` repository secrets once promoted into `.github/workflows`.
+Manual deployment is prepared through `npm run deploy:cloudflare`. The manual GitHub Actions workflow in `.github/workflows/cloudflare-pages.yml` creates the Pages project if needed and deploys `dist`. It requires `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` repository secrets.
+
+The GitHub deploy token is deliberately limited to `Pages Write`. DNS-01 certificate automation uses a separate Cloudflare token with `Zone Read` and `DNS Write` for `denley.nz`, stored only in Kubernetes as `cert-manager/cloudflare-api-token-secret`.
 
 ### Kubernetes
 

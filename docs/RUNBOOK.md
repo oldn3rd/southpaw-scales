@@ -13,9 +13,15 @@ The project is configured for Cloudflare Pages as `southpaw-scales`.
 
 Required Cloudflare token permissions:
 
-- Cloudflare Pages: Edit
-- Account access for `Andy@denley.nz's Account`
-- DNS edit for `denley.nz` if the deploy process will also manage the custom-domain DNS record
+- Pages deploy token: `Pages Write` only, account-owned, stored as the GitHub repository secret `CLOUDFLARE_API_TOKEN`
+- Account ID: stored as the GitHub repository secret `CLOUDFLARE_ACCOUNT_ID`
+
+Do not give the Pages deploy token DNS permissions. DNS and certificate automation use a separate Kubernetes-only token named `cert-manager DNS-01 denley.nz` with:
+
+- `Zone Read` for `denley.nz`
+- `DNS Write` for `denley.nz`
+
+That DNS token is stored in the cluster as `cert-manager/cloudflare-api-token-secret` and should not be copied into GitHub.
 
 Manual deploy:
 
@@ -23,7 +29,7 @@ Manual deploy:
 npm run deploy:cloudflare
 ```
 
-The manual GitHub Actions deploy template is in `docs/examples/cloudflare-pages.workflow.yml`. After the GitHub token has `workflow` scope, copy it to `.github/workflows/cloudflare-pages.yml`.
+The manual GitHub Actions deploy workflow is in `.github/workflows/cloudflare-pages.yml`. It creates the `southpaw-scales` Pages project if needed and then deploys the built `dist` directory.
 
 It requires these GitHub repository secrets:
 

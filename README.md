@@ -32,13 +32,15 @@ npm run build
 
 The app is static and can be hosted on Cloudflare Pages at `guitar.denley.nz`.
 
-Manual deploy, once the Cloudflare token has Pages edit access:
+Manual deploy, using a Cloudflare token with Pages edit access only:
 
 ```bash
 npm run deploy:cloudflare
 ```
 
-GitHub Actions is also prepared as a manual workflow template in `docs/examples/cloudflare-pages.workflow.yml`. After the GitHub token has `workflow` scope, copy it to `.github/workflows/cloudflare-pages.yml` and add these repository secrets before running it:
+GitHub Actions is configured as a manual workflow in `.github/workflows/cloudflare-pages.yml`. It creates the `southpaw-scales` Pages project if needed, then deploys `dist`.
+
+The workflow uses these GitHub repository secrets:
 
 ```text
 CLOUDFLARE_API_TOKEN
@@ -46,6 +48,8 @@ CLOUDFLARE_ACCOUNT_ID
 ```
 
 The current Cloudflare account ID is `00a81954913ed3315c60cec2bc57a8b8`.
+
+Security note: the GitHub deploy token is intentionally `Pages Write` only. DNS and certificate automation use a separate Kubernetes-only token named `cert-manager DNS-01 denley.nz`, scoped to `Zone Read` and `DNS Write` for `denley.nz`.
 
 ## Container
 
